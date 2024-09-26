@@ -1,0 +1,54 @@
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <title>Статьи</title>
+</head>
+<body>
+    <!-- Форма для выбора количества статей на странице -->
+    <form method="get">
+        <label for="items_per_page">Количество статей на странице:</label>
+        <select name="items_per_page" id="items_per_page" onchange="this.form.submit()">
+            <option value="5" {% if request.GET.items_per_page == '5' %}selected{% endif %}>5</option>
+            <option value="10" {% if request.GET.items_per_page == '10' %}selected{% endif %}>10</option>
+            <option value="20" {% if request.GET.items_per_page == '20' %}selected{% endif %}>20</option>
+            <option value="50" {% if request.GET.items_per_page == '50' %}selected{% endif %}>50</option>
+        </select>
+    </form>
+
+    <div class="row">
+        {% for article in page_obj %}
+            <div class="col-md-4">
+                <p>{{ article.created|date:"d.m.Y H:i" }}</p>
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.body }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}&items_per_page={{ items_per_page }}{% else %}#{% endif %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo; предыдущая</span>
+                </a>
+            </li>
+
+            {% for i in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == i %}active{% endif %}" aria-current="page">
+                    <a class="page-link" href="{% if page_obj.number != i %}?page={{ i }}&items_per_page={{ items_per_page }}{% else %}#{% endif %}">{{ i }}</a>
+                </li>
+            {% endfor %}
+
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}&items_per_page={{ items_per_page }}{% else %}#{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">следующая &raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</body>
+</html>
